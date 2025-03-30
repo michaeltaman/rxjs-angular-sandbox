@@ -1,0 +1,11 @@
+﻿fastapi
+uvicorn
+psycopg2-binary
+asyncpg
+fastapi[all]
+bcrypt
+python-dotenv
+sqlalchemy
+alembic
+python-jose
+
