@@ -1,0 +1,13 @@
+<div class="profile-menu">
+  <img
+    [src]="user?.avatar || 'assets/images/wordpress_default-avatar.png'"
+    alt="Профиль"
+    class="profile-avatar"
+    (click)="goToProfile()"
+  />
+
+  <div class="profile-info">
+    <span>{{ user?.firstName }} {{ user?.lastName }}</span>
+    <!-- <p>{{ user?.email }}</p> -->
+  </div>
+</div>

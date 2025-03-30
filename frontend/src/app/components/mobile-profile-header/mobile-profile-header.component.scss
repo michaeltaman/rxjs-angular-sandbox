@@ -1,0 +1,79 @@
+.mobile-header {
+  position: absolute; /* ✅ Изменяем с absolute, чтобы не перекрывать крестик */
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #4a90e2;
+  color: white;
+  border-radius: 10px;
+}
+
+.user-first-name{
+  background-color: red;
+}
+
+.user-last-name{
+  background-color: red;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #f0f0f0;
+  color: #4a90e2;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+}
+
+
+.user-name {
+  font-weight: bold;
+}
+
+.user-phone {
+  font-size: 0.6em;
+  opacity: 0.8;
+  padding-top: 5px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  margin-left: -10px; // Сдвигаем влево
+}
+
+.clock {
+  padding-left: 50px; // Hатягиваем компонент вправо
+  margin-right: 10px; // Уменьшаем отступ, чтобы часы были ближе к Луне
+  background-color: green;
+  white-space: nowrap; // ❗️ Запрещает перенос элементов на новую строку
+}
+
+.moon-icon {
+  cursor: pointer;
+}

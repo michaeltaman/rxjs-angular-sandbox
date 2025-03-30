@@ -1,0 +1,129 @@
+<div class="registration-container">
+  <h2>Регистрация пользователя</h2>
+
+  <!-- ✅ Сообщение о результате регистрации -->
+  <p *ngIf="message$ | async as message" [class]="message.type">
+    {{ message.text }}
+  </p>
+
+  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+    <!-- Имя -->
+    <label for="firstName">Имя:</label>
+    <input
+      id="firstName"
+      type="text"
+      formControlName="firstName"
+      placeholder="Введите имя"
+    />
+    <p
+      *ngIf="
+        registrationForm.get('firstName')?.invalid &&
+        registrationForm.get('firstName')?.touched
+      "
+      class="error"
+    >
+      Имя должно содержать не менее 2 букв!
+    </p>
+
+    <!-- Фамилия -->
+    <label for="lastName">Фамилия:</label>
+    <input
+      id="lastName"
+      type="text"
+      formControlName="lastName"
+      placeholder="Введите фамилию"
+    />
+    <p
+      *ngIf="
+        registrationForm.get('lastName')?.invalid &&
+        registrationForm.get('lastName')?.touched
+      "
+      class="error"
+    >
+      Фамилия должна содержать не менее 2 букв!
+    </p>
+
+    <!-- Email -->
+    <label for="email">Email:</label>
+    <div class="email-input">
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Введите email"
+      />
+      <div class="spinner-container" *ngIf="isCheckingEmail">
+        <app-round-spinner></app-round-spinner>
+      </div>
+    </div>
+    <p *ngIf="emailExists" class="error">❌ Этот email уже используется!</p>
+
+    <!-- Пароль -->
+    <label for="password">Пароль:</label>
+    <input
+      id="password"
+      type="password"
+      formControlName="password"
+      placeholder="Введите пароль"
+    />
+    <p
+      *ngIf="registrationForm.get('password')?.errors?.['passwordStrength'] && registrationForm.get('password')?.touched"
+      class="error"
+    >
+      Пароль должен быть не менее 8 символов, содержать хотя бы одну заглавную
+      букву, один спецсимвол (&#64;#$%^&*) и одну цифру!
+    </p>
+
+    <!-- Подтверждение пароля -->
+    <label for="confirmPassword">Подтверждение пароля:</label>
+    <input
+      id="confirmPassword"
+      type="password"
+      formControlName="confirmPassword"
+      placeholder="Повторите пароль"
+    />
+    <p *ngIf="passwordMismatch" class="error">Пароли не совпадают!</p>
+
+    <!-- Чекбокс для инвайт-кода -->
+    <div class="invite-checkbox">
+      <input
+        type="checkbox"
+        id="hasInvite"
+        (change)="toggleInviteCode($event)"
+      />
+      <label for="hasInvite">У меня есть инвайт-код</label>
+    </div>
+
+    <!-- Инвайт-код (по умолчанию скрыт) -->
+    <div class="invite-code-container" *ngIf="inviteCodeEnabled">
+      <label for="inviteCode">Инвайт-код:</label>
+      <div class="invite-code-input">
+        <input
+          id="inviteCode"
+          type="text"
+          formControlName="inviteCode"
+          placeholder="Введите инвайт-код"
+        />
+        <div class="spinner-container" *ngIf="isCheckingInvite">
+          <app-round-spinner></app-round-spinner>
+        </div>
+      </div>
+      <p *ngIf="inviteCodeInvalid" class="error">❌ Неверный инвайт-код!</p>
+      <p *ngIf="inviteCodeUsed" class="error">
+        ❌ Этот инвайт-код уже использован!
+      </p>
+    </div>
+
+    <!-- Кнопка регистрации -->
+    <button
+      type="submit"
+      [disabled]="
+        registrationForm.invalid ||
+        passwordMismatch ||
+        (inviteCodeEnabled && (inviteCodeUsed || inviteCodeInvalid))
+      "
+    >
+      Зарегистрироваться
+    </button>
+  </form>
+</div>

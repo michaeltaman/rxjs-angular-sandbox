@@ -1,0 +1,15 @@
+<div class="edit-profile-container">
+  <h2>Редактирование профиля</h2>
+  <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+    <label for="firstName">Имя:</label>
+    <input id="firstName" type="text" formControlName="firstName" />
+
+    <label for="lastName">Фамилия:</label>
+    <input id="lastName" type="text" formControlName="lastName" />
+
+    <label for="email">Email:</label>
+    <input id="email" type="email" formControlName="email" />
+
+    <button type="submit" [disabled]="profileForm.invalid">Сохранить</button>
+  </form>
+</div>

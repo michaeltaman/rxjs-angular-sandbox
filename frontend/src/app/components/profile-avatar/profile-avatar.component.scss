@@ -1,0 +1,27 @@
+.profile-menu {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; // Вправо
+  padding-right: 30px; // Отступ
+}
+
+.profile-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info span {
+  font-weight: bold;
+}
+
+.profile-info p {
+  font-size: 12px;
+  color: rgb(27, 27, 27);
+}

@@ -1,0 +1,237 @@
+/* ✅ Основной контейнер */
+.app-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ Верхнее меню для десктопа */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* ✅ Ссылки в верхнем меню */
+.navbar {
+  display: flex;
+  gap: 20px;
+}
+
+.navbar a {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: background 0.3s ease-in-out;
+}
+
+.navbar a img {
+  margin-right: 8px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ✅ Ховер эффект */
+ a:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ✅ Кнопка сэндвича (только на мобильных устройствах) */
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  display: none;
+}
+
+/* ✅ Сайдбар */
+.sidebar {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  width: 350px;
+  height: 100vh;
+  background: #3b82f6;
+  z-index: 1100;
+  box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 20px; //отступ от крестика
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(-100%);
+}
+
+.sidebar--auth {
+  padding-top: 95px; //отступ от крестика когда isAuthenticated === true
+}
+
+/* ✅ Открытый сайдбар */
+.menu-open .sidebar {
+  transform: translateX(0);
+}
+
+/* ✅ Кнопка закрытия */
+.close-btn {
+  position: relative;
+  top: 0px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: white;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-left: 10px;
+  margin-top: 5px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  transition: background 0.3s ease-in-out;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ✅ Меню в сайдбаре */
+.sidebar a, .logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: white; /* ✅ Цвет текста такой же, как у остальных кнопок */
+  text-decoration: none;
+  font-size: 18px;
+  padding: 5px 20px; /* ✅ Те же отступы */
+  border-radius: 12px; /* ✅ Округлённые края */
+  width: 83%; /* ✅ Фиксированная ширина */
+  margin: 5px auto; /* ✅ Центрирование */
+  background: transparent; /* ✅ Убираем белый фон */
+  border: none; /* ✅ Убираем серую рамку */
+  transition: background 0.3s ease-in-out;
+}
+
+.sidebar a img {
+  margin-right: 10px;
+  width: 22px;
+  height: 22px;
+}
+
+.sidebar a:hover, .logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 5px 20px; /* ✅ Поддерживаем тот же padding */
+  border-radius: 12px; /* ✅ Скругление остаётся */
+  cursor: pointer; /* Добавляем курсор-указатель */
+}
+
+
+/* ✅ Стили для выделенной активной страницы */
+.active-link {
+  background-color: rgb(93, 90, 90) !important; /* Чёрный фон */
+  color: white !important; /* Белый текст */
+  border-radius: 12px; /* Скруглённые края */
+  padding: 5px 20px; /* Отступы, чтобы кнопки были одинаковые */
+}
+
+
+
+.profile-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 50px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.profile-avatar {
+   border-radius: 50%;
+}
+
+.profile-info h2 {
+  margin: 0;
+  color: #3b82f6;
+}
+
+.edit-profile-btn {
+  margin-top: 20px;
+  background: #3b82f6;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+/* ✅ Контейнер для аватара */
+.avatar {
+  padding-right: 30px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* ✅ Круглая подсветка */
+.avatar app-profile-avatar {
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Подсветка, которая НЕ мешает клику */
+.avatar app-profile-avatar::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background-color: rgba(173, 216, 230, 0.5);
+  opacity: 0;
+  transform: translate(-80%, -50%);
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none; /* 🔥 Теперь можно кликать на сам аватар */
+}
+
+/* ✅ Показываем подсветку при наведении */
+.avatar app-profile-avatar:hover::after {
+  opacity: 1;
+}
+
+
+/* ✅ Медиа-запрос для мобильных устройств */
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+  .navbar {
+    display: none;
+  }
+  .menu-open .navbar {
+    display: none; /* ✅ Полностью скрываем верхнее меню при открытом сайдбаре */
+  }
+}

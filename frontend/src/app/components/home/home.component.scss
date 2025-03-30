@@ -1,0 +1,6 @@
+/* ✅ Отступ сверху, чтобы контент не накладывался на шапку */
+.home-container {
+    margin-top: 80px; /* Учитываем высоту шапки */
+    text-align: center;
+    padding: 20px;
+  }

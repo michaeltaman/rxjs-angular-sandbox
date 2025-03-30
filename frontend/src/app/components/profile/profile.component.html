@@ -1,0 +1,16 @@
+<div class="profile-container">
+  <div class="profile-header">
+    <img
+      [src]="user?.avatar || 'assets/images/wpavatar.webp'"
+      alt="Аватар"
+      class="profile-avatar"
+    />
+    <div class="profile-info">
+      <h2>{{ user?.firstName }} {{ user?.lastName }}</h2>
+      <p>{{ user?.email }}</p>
+    </div>
+  </div>
+  <button class="edit-profile-btn" (click)="editProfile()">
+    ✏️ Редактировать профиль
+  </button>
+</div>

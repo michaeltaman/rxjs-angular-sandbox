@@ -1,0 +1,99 @@
+<div class="app-container" [class.menu-open]="isMenuOpen">
+  <!-- ✅ Верхнее меню для десктопа -->
+  <header class="header">
+    <nav class="navbar">
+      <a
+        routerLink="/home"
+        routerLinkActive="active"
+        [ngClass]="getActiveClass('/home')"
+      >
+        <img src="assets/home-icon.png" alt="Главная" /> Главная
+      </a>
+      <a
+        routerLink="/register"
+        routerLinkActive="active"
+        *ngIf="!isAuthenticated"
+        [ngClass]="getActiveClass('/register')"
+      >
+        <img src="assets/register-icon.png" alt="Регистрация" /> Регистрация
+      </a>
+      <a
+        routerLink="/login"
+        routerLinkActive="active"
+        *ngIf="!isAuthenticated"
+        [ngClass]="getActiveClass('/login')"
+      >
+        🔑 Вход
+      </a>
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        *ngIf="isAuthenticated"
+        [ngClass]="getActiveClass('/dashboard')"
+      >
+        📊 Кабинет
+      </a>
+      <a *ngIf="isAuthenticated" (click)="logout()" style="cursor: pointer">
+        🚪 Выйти
+      </a>
+    </nav>
+    <button class="menu-btn" (click)="toggleMenu()">☰</button>
+    <!-- Контейнер для аватара, скрываем если меню открыто -->
+    <div class="avatar" *ngIf="isAuthenticated && !isMenuOpen">
+      <app-profile-avatar></app-profile-avatar>
+    </div>
+  </header>
+
+  <!-- ✅ Сайдбар (для мобильных устройств) -->
+  <div class="sidebar" [ngClass]="{ 'sidebar--auth': isAuthenticated }">
+    <app-mobile-profile-header
+      *ngIf="isAuthenticated"
+      [user]="user"
+      (toggleTheme)="toggleTheme()"
+    ></app-mobile-profile-header>
+    <button class="close-btn" (click)="toggleMenu()">✖</button>
+    <a
+      routerLink="/home"
+      routerLinkActive="active"
+      (click)="toggleMenu()"
+      [ngClass]="getActiveClass('/home')"
+    >
+      <img src="assets/home-icon.png" alt="Главная" /> Главная
+    </a>
+    <a
+      routerLink="/register"
+      routerLinkActive="active"
+      *ngIf="!isAuthenticated"
+      (click)="toggleMenu()"
+      [ngClass]="getActiveClass('/register')"
+    >
+      <img src="assets/register-icon.png" alt="Регистрация" /> Регистрация
+    </a>
+    <a
+      routerLink="/login"
+      routerLinkActive="active"
+      *ngIf="!isAuthenticated"
+      [ngClass]="getActiveClass('/login')"
+      (click)="closeMenu()"
+    >
+      🔑 Вход
+    </a>
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="active"
+      *ngIf="isAuthenticated"
+      (click)="closeMenu()"
+      [ngClass]="getActiveClass('/dashboard')"
+    >
+      📊 Кабинет
+    </a>
+    <a class="logout-btn" *ngIf="isAuthenticated" (click)="logout()">
+      🚪 Выйти
+    </a>
+  </div>
+
+  <!-- ✅ Основной контент -->
+  <div class="content" [class.dark-theme]="isDarkMode">
+    <router-outlet></router-outlet>
+  </div>
+</div>

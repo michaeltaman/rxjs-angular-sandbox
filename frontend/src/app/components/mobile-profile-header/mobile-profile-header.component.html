@@ -1,0 +1,23 @@
+<div class="mobile-header">
+  <div class="header-left">
+    <div class="avatar" *ngIf="!user?.avatar; else userBlock">
+      {{ initials }}
+    </div>
+    <ng-template #userBlock>
+      <img [src]="user?.avatar" class="avatar-img" alt="User Avatar" />
+    </ng-template>
+    <div class="user-info" *ngIf="user">
+      <span class="user-first-name">{{ user?.firstName }}</span>
+      <span class="user-last-name">{{ user?.lastName }}</span>
+      <span class="user-phone" *ngIf="user?.phoneNumber">{{
+        user?.phoneNumber
+      }}</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="clock">🕒 {{ currentTime }}</span>
+    <span class="moon-icon" (click)="toggleThemeClick()">
+      {{ themeIcon }}
+    </span>
+  </div>
+</div>
