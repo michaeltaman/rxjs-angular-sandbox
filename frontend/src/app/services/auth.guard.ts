@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = () => {
   return authService.authStatus$.pipe(
     map((isAuthenticated) => {
       if (isAuthenticated) {
-        loggingService.log('authGuard', '✅ User is authenticated');
+        loggingService.info('authGuard', '✅ User is authenticated');
         return true;
       } else {
         loggingService.warn('authGuard', '⚠️ User is NOT authenticated');

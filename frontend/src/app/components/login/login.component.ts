@@ -48,12 +48,12 @@ export class LoginComponent implements OnInit {
 
       this.authService.login(email, password).subscribe({
         next: () => {
-          this.loggingService.log('loginComponent', '✅ Login successful');
+          this.loggingService.info('loginComponent', '✅ Login successful');
 
           // ✅ Получаем профиль после успешного логина
           this.userService.getUserProfile().subscribe({
             next: (profile) => {
-              this.loggingService.log(
+              this.loggingService.info(
                 'loginComponent',
                 '✅ User profile loaded:',
                 profile

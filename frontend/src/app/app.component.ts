@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
+import { ActivityService } from './services/activity.service';
 import { CommonModule } from '@angular/common';
 import { ProfileAvatarComponent } from './components/profile-avatar/profile-avatar.component';
 import { MobileProfileHeaderComponent } from './components/mobile-profile-header/mobile-profile-header.component';
@@ -30,18 +31,18 @@ export class AppComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private activityService: ActivityService,
     private router: Router,
     private userService: UserService,
     private loggingService: LoggingService
   ) {}
 
   ngOnInit(): void {
-    this.loggingService.log('appComponent', '🚀 Приложение загружается...');
+    this.loggingService.info('appComponent', '🚀 Приложение загружается...');
     this.authService.restoreSession();
 
-    // ✅ Подписываемся на статус авторизации
     this.authService.authStatus$.subscribe((isAuth) => {
-      this.loggingService.log(
+      this.loggingService.info(
         'appComponent',
         '🔒 Статус авторизации изменён:',
         isAuth
@@ -49,13 +50,13 @@ export class AppComponent implements OnInit {
       this.isAuthenticated = isAuth;
 
       if (isAuth) {
-        this.loggingService.log(
+        this.loggingService.info(
           'appComponent',
           '✅ Пользователь авторизован — пробуем получить профиль...'
         );
         this.userService.getUserProfile().subscribe({
           next: (profile) => {
-            this.loggingService.log(
+            this.loggingService.info(
               'appComponent',
               '✅ Профиль загружен:',
               profile
@@ -70,9 +71,6 @@ export class AppComponent implements OnInit {
             );
           },
         });
-
-        // ✅ Запускаем обновление токена только после успешной авторизации
-        this.authService.startInactivityTimer();
       } else {
         this.loggingService.warn(
           'appComponent',
@@ -81,12 +79,12 @@ export class AppComponent implements OnInit {
       }
     });
 
-    // ✅ Слушатель на любое действие пользователя
+    // ✅ Слушатель действий пользователя
     document.addEventListener('click', () => {
       if (this.isAuthenticated) {
         this.authService.handleUserAction().subscribe({
           next: () => {
-            this.loggingService.log(
+            this.loggingService.info(
               'appComponent',
               '✅ Token checked on user action'
             );
@@ -122,16 +120,16 @@ export class AppComponent implements OnInit {
 
   onUserAction(): void {
     if (this.isAuthenticated) {
-      this.loggingService.log(
+      this.loggingService.info(
         'appComponent',
         '🖱️ User action detected — checking token...'
       );
       this.authService.handleUserAction().subscribe({
         next: () => {
-          this.loggingService.log('appComponent', '✅ Token check complete');
+          this.loggingService.info('appComponent', '✅ Token check complete');
           this.userService.getUserProfile().subscribe({
             next: (profile) => {
-              this.loggingService.log(
+              this.loggingService.info(
                 'appComponent',
                 '✅ Профиль загружен:',
                 profile
@@ -157,7 +155,7 @@ export class AppComponent implements OnInit {
   }
 
   logout(): void {
-    this.loggingService.log('appComponent', '🚪 Выход из системы...');
+    this.loggingService.info('appComponent', '🚪 Выход из системы...');
     this.authService.logout();
     this.router.navigate(['/login']);
     this.closeMenu();

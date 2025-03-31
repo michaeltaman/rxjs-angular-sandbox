@@ -21,7 +21,7 @@ export class ProfileAvatarComponent {
   ngOnInit() {
     this.userService.user$.subscribe((data) => {
       this.user = data;
-      this.loggingService.log(
+      this.loggingService.info(
         'profileAvatarComponent',
         'User data loaded in avatar:',
         this.user

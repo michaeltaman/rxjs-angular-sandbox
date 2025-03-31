@@ -48,7 +48,7 @@ export class UserService {
   private addToken(headers: HttpHeaders): HttpHeaders {
     const token = sessionStorage.getItem('access_token');
     if (token) {
-      this.loggingService.log(
+      this.loggingService.info(
         'userService',
         `🛡️ Adding token to header: ${token}`
       );
@@ -84,7 +84,7 @@ export class UserService {
           return user;
         }),
         tap((user) => {
-          this.loggingService.log(
+          this.loggingService.info(
             'userService',
             '🔍 API вернул пользователя:',
             user

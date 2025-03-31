@@ -5,7 +5,7 @@ const DEBUG_MODE = false; // Установи в true, чтобы принуди
 
 @Injectable({ providedIn: 'root' })
 export class LoggingService {
-  log(component: string, message: string, data?: any): void {
+  info(component: string, message: string, data?: any): void {
     if (DEBUG_MODE || LOGGING_CONFIG[component]?.includes('info')) {
       console.log(`[${component}] ${message}`);
       if (data !== undefined) {

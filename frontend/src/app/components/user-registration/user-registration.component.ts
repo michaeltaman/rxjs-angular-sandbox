@@ -144,7 +144,7 @@ export class UserRegistrationComponent {
     this.isCheckingEmail = true;
     this.isCheckingInvite = true;
     this.message$.subscribe((msg) => {
-      this.loggingService.log(
+      this.loggingService.info(
         'userRegistrationComponent',
         '🔄 Обновление UI:',
         msg
@@ -165,7 +165,7 @@ export class UserRegistrationComponent {
   }
 
   toggleInviteCode(event: any) {
-    this.loggingService.log(
+    this.loggingService.info(
       'userRegistrationComponent',
       'Чекбокс изменён:',
       event.target.checked
@@ -175,14 +175,14 @@ export class UserRegistrationComponent {
     const inviteCodeControl = this.registrationForm.get('inviteCode');
 
     if (this.inviteCodeEnabled) {
-      this.loggingService.log(
+      this.loggingService.info(
         'userRegistrationComponent',
         '✅ Поле Инвайт-код включено!'
       );
       inviteCodeControl?.enable({ emitEvent: false }); // ✅ Включаем поле без лишних событий
       inviteCodeControl?.setValidators([Validators.required]); // ✅ Добавляем валидацию
     } else {
-      this.loggingService.log(
+      this.loggingService.info(
         'userRegistrationComponent',
         '❌ Поле Инвайт-код отключено!'
       );
@@ -214,7 +214,7 @@ export class UserRegistrationComponent {
 
       this.userService.register(payload).subscribe({
         next: (response) => {
-          this.loggingService.log(
+          this.loggingService.info(
             'userRegistrationComponent',
             '✅ Регистрация успешна:',
             response
@@ -243,7 +243,7 @@ export class UserRegistrationComponent {
   }
 
   private showMessage(text: string, type: 'success' | 'error') {
-    this.loggingService.log(
+    this.loggingService.info(
       'userRegistrationComponent',
       `🔔 showMessage() вызван с текстом: ${text}, тип: ${type}`
     );
@@ -251,7 +251,7 @@ export class UserRegistrationComponent {
     this.cdr.detectChanges(); // ✅ Форсируем обновление UI
 
     timer(5000).subscribe(() => {
-      this.loggingService.log(
+      this.loggingService.info(
         'userRegistrationComponent',
         '⏳ Очистка сообщения через 5 секунд'
       );

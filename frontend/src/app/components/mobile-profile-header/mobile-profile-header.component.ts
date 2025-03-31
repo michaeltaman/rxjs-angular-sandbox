@@ -57,17 +57,17 @@ export class MobileProfileHeaderComponent implements OnInit, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['user']) {
-      this.loggingService.log(
+      this.loggingService.info(
         'mobileProfileHeaderComponent',
         '📌 User received in mobile-profile-header:',
         this.user
       );
-      this.loggingService.log(
+      this.loggingService.info(
         'mobileProfileHeaderComponent',
         '👀 User first name:',
         this.user?.firstName
       );
-      this.loggingService.log(
+      this.loggingService.info(
         'mobileProfileHeaderComponent',
         '👀 User last name:',
         this.user?.lastName

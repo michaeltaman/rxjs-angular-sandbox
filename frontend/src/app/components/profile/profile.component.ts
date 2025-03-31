@@ -21,7 +21,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.userService.user$.subscribe((data) => {
       this.user = data;
-      this.loggingService.log(
+      this.loggingService.info(
         'profileComponent',
         'User data loaded in profile:',
         this.user

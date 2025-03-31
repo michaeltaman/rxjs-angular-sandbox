@@ -22,7 +22,7 @@ constructor(private loggingService: LoggingService) {}
 ### 2. Вызов логов
 
 ```ts
-this.loggingService.log('authService', '✅ Пользователь авторизован');
+this.loggingService.info('authService', '✅ Пользователь авторизован');
 this.loggingService.warn('userService', '⚠️ Отсутствует номер телефона');
 this.loggingService.error('authService', '❌ Ошибка при обновлении токена', error);
 ```
@@ -69,7 +69,7 @@ const DEBUG_MODE = true;
 ## 🧪 Пример
 
 ```ts
-this.loggingService.log(
+this.loggingService.info(
   'authService',
   '✅ Токены сохранены в SessionStorage',
   { access_token: 'abc...', refresh_token: 'xyz...' }
