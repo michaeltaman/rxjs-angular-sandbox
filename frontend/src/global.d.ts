@@ -21,6 +21,8 @@ declare global {
       logConfig?: {
         [key: string]: ('info' | 'warn' | 'error')[];
       };
+
+      DEBUG_TRACE?: boolean;
     };
   }
 }
