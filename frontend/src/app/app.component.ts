@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
@@ -8,6 +10,7 @@ import { ProfileAvatarComponent } from './components/profile-avatar/profile-avat
 import { MobileProfileHeaderComponent } from './components/mobile-profile-header/mobile-profile-header.component';
 import { UserService } from './services/user.service';
 import { LoggingService } from './services/logging.service';
+import { BaseComponent } from '../app/components/base.component';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +25,7 @@ import { LoggingService } from './services/logging.service';
     MobileProfileHeaderComponent,
   ],
 })
-export class AppComponent implements OnInit {
+export class AppComponent extends BaseComponent implements OnInit {
   title = 'rxjs-angular-sandbox';
   isMenuOpen = false;
   isDarkMode = false;
@@ -34,55 +37,67 @@ export class AppComponent implements OnInit {
     private activityService: ActivityService,
     private router: Router,
     private userService: UserService,
-    private loggingService: LoggingService
-  ) {}
+    protected override loggingService: LoggingService
+  ) {
+    super(loggingService);
+  }
 
   ngOnInit(): void {
     this.loggingService.info('appComponent', '🚀 Приложение загружается...');
     this.authService.restoreSession();
 
-    this.authService.authStatus$.subscribe((isAuth) => {
-      this.loggingService.info(
-        'appComponent',
-        '🔒 Статус авторизации изменён:',
-        isAuth
-      );
-      this.isAuthenticated = isAuth;
-
-      if (isAuth) {
+    this.authService.authStatus$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isAuth) => {
         this.loggingService.info(
           'appComponent',
-          '✅ Пользователь авторизован — пробуем получить профиль...'
+          '🔒 Статус авторизации изменён:',
+          isAuth
         );
-        this.userService.getUserProfile().subscribe({
-          next: (profile) => {
-            this.loggingService.info(
-              'appComponent',
-              '✅ Профиль загружен:',
-              profile
-            );
-            this.user = profile;
-          },
-          error: (err) => {
-            this.loggingService.error(
-              'appComponent',
-              '❌ Ошибка при получении профиля:',
-              err
-            );
-          },
-        });
-      } else {
-        this.loggingService.warn(
-          'appComponent',
-          '⚠️ Пользователь не авторизован'
-        );
-      }
-    });
+        this.isAuthenticated = isAuth;
 
-    // ✅ Слушатель действий пользователя
-    document.addEventListener('click', () => {
-      if (this.isAuthenticated) {
-        this.authService.handleUserAction().subscribe({
+        if (isAuth) {
+          this.loggingService.info(
+            'appComponent',
+            '✅ Пользователь авторизован — пробуем получить профиль...'
+          );
+          this.userService
+            .getUserProfile()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (profile) => {
+                this.loggingService.info(
+                  'appComponent',
+                  '✅ Профиль загружен:',
+                  profile
+                );
+                this.user = profile;
+              },
+              error: (err) => {
+                this.loggingService.error(
+                  'appComponent',
+                  '❌ Ошибка при получении профиля:',
+                  err
+                );
+              },
+            });
+        } else {
+          this.loggingService.warn(
+            'appComponent',
+            '⚠️ Пользователь не авторизован'
+          );
+        }
+      });
+
+    document.addEventListener('click', this.onClickBound);
+  }
+
+  private onClickBound = () => {
+    if (this.isAuthenticated) {
+      this.authService
+        .handleUserAction()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
           next: () => {
             this.loggingService.info(
               'appComponent',
@@ -97,8 +112,15 @@ export class AppComponent implements OnInit {
             );
           },
         });
-      }
-    });
+    }
+  };
+
+  override ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    document.removeEventListener('click', this.onClickBound);
+    this.loggingService.info('AppComponent', '🧹 Очистка событий при выходе');
+    super.ngOnDestroy();
   }
 
   toggleMenu() {
@@ -124,33 +146,39 @@ export class AppComponent implements OnInit {
         'appComponent',
         '🖱️ User action detected — checking token...'
       );
-      this.authService.handleUserAction().subscribe({
-        next: () => {
-          this.loggingService.info('appComponent', '✅ Token check complete');
-          this.userService.getUserProfile().subscribe({
-            next: (profile) => {
-              this.loggingService.info(
-                'appComponent',
-                '✅ Профиль загружен:',
-                profile
-              );
-            },
-            error: (err) => {
-              this.loggingService.error(
-                'appComponent',
-                '❌ Ошибка при получении профиля:',
-                err
-              );
-            },
-          });
-        },
-        error: (err) =>
-          this.loggingService.error(
-            'appComponent',
-            '❌ Error during token check:',
-            err
-          ),
-      });
+      this.authService
+        .handleUserAction()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.loggingService.info('appComponent', '✅ Token check complete');
+            this.userService
+              .getUserProfile()
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: (profile) => {
+                  this.loggingService.info(
+                    'appComponent',
+                    '✅ Профиль загружен:',
+                    profile
+                  );
+                },
+                error: (err) => {
+                  this.loggingService.error(
+                    'appComponent',
+                    '❌ Ошибка при получении профиля:',
+                    err
+                  );
+                },
+              });
+          },
+          error: (err) =>
+            this.loggingService.error(
+              'appComponent',
+              '❌ Error during token check:',
+              err
+            ),
+        });
     }
   }
 

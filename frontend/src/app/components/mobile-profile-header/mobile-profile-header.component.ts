@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoggingService } from '../../services/logging.service';
+import { BaseComponent } from '../base.component';
 
 @Component({
   selector: 'app-mobile-profile-header',
@@ -17,7 +18,10 @@ import { LoggingService } from '../../services/logging.service';
   templateUrl: './mobile-profile-header.component.html',
   styleUrls: ['./mobile-profile-header.component.scss'],
 })
-export class MobileProfileHeaderComponent implements OnInit, OnDestroy {
+export class MobileProfileHeaderComponent
+  extends BaseComponent
+  implements OnInit, OnDestroy
+{
   @Input() user: any = null;
   @Output() toggleTheme = new EventEmitter<void>();
 
@@ -25,7 +29,8 @@ export class MobileProfileHeaderComponent implements OnInit, OnDestroy {
   currentTime: string;
   private intervalId: any;
 
-  constructor(private loggingService: LoggingService) {
+  constructor(protected override loggingService: LoggingService) {
+    super(loggingService);
     this.currentTime = new Date().toLocaleTimeString();
   }
 
@@ -35,9 +40,14 @@ export class MobileProfileHeaderComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  ngOnDestroy() {
+  override ngOnDestroy(): void {
+    super.ngOnDestroy();
     if (this.intervalId) {
       clearInterval(this.intervalId);
+      this.loggingService.info(
+        'mobileProfileHeaderComponent',
+        '🛑 Таймер текущего времени очищен в ngOnDestroy()'
+      );
     }
   }
 
@@ -52,7 +62,12 @@ export class MobileProfileHeaderComponent implements OnInit, OnDestroy {
 
   toggleThemeClick() {
     this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark-theme', this.isDarkMode); // ✅ Переключаем класс
+    document.body.classList.toggle('dark-theme', this.isDarkMode);
+    this.toggleTheme.emit();
+    this.loggingService.info(
+      'mobileProfileHeaderComponent',
+      `🎨 Theme toggled: ${this.isDarkMode ? 'dark' : 'light'}`
+    );
   }
 
   ngOnChanges(changes: SimpleChanges) {

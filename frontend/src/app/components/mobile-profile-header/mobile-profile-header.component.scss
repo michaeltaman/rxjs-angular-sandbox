@@ -1,14 +1,17 @@
 .mobile-header {
-  position: absolute; /* ✅ Изменяем с absolute, чтобы не перекрывать крестик */
-  top: 0;
+  width: 100vw; // полная ширина окна
+  max-width: 100%;
+  padding: 0.6rem 1rem;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background-color: #4a90e2;
+  background-color:#659bd8;
   color: white;
-  border-radius: 10px;
+  position: relative;
+  z-index: 1000;
 }
+
 
 .user-first-name{
   background-color: red;

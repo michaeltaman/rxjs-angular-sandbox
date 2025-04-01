@@ -1,25 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
 import { UserService } from '../../services/user.service';
 import { LoggingService } from '../../services/logging.service';
+import { BaseComponent } from '../base.component';
 
 @Component({
   selector: 'app-profile-avatar',
-  standalone: true,
   templateUrl: './profile-avatar.component.html',
   styleUrls: ['./profile-avatar.component.scss'],
 })
-export class ProfileAvatarComponent {
+export class ProfileAvatarComponent extends BaseComponent implements OnInit {
   user: any = null;
 
   constructor(
     private userService: UserService,
     private router: Router,
-    private loggingService: LoggingService
-  ) {}
+    protected override loggingService: LoggingService
+  ) {
+    super(loggingService);
+  }
 
-  ngOnInit() {
-    this.userService.user$.subscribe((data) => {
+  ngOnInit(): void {
+    this.userService.user$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
       this.user = data;
       this.loggingService.info(
         'profileAvatarComponent',

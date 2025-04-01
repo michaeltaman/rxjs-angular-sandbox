@@ -1,4 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ViewEncapsulation,
+  ChangeDetectorRef,
+  OnInit,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,12 +23,13 @@ import {
   switchMap,
   tap,
   filter,
+  takeUntil,
 } from 'rxjs';
 import { RoundSpinnerComponent } from '../../shared/round-spinner/round-spinner.component';
 import { UserService } from '../../services/user.service';
-import { ChangeDetectorRef } from '@angular/core';
 import { RegisterUser } from '../../shared/models/user.model';
 import { LoggingService } from '../../services/logging.service';
+import { BaseComponent } from '../base.component';
 
 @Component({
   selector: 'app-user-registration',
@@ -33,7 +39,7 @@ import { LoggingService } from '../../services/logging.service';
   styleUrls: ['./user-registration.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class UserRegistrationComponent {
+export class UserRegistrationComponent extends BaseComponent implements OnInit {
   registrationForm: FormGroup;
   passwordMismatch: boolean = false;
   emailExists = false;
@@ -41,7 +47,7 @@ export class UserRegistrationComponent {
   isCheckingInvite = false;
   inviteCodeUsed = false;
   inviteCodeEnabled = false;
-  inviteCodeInvalid = false; // ✅ Контролируем видимость инвайт-кода
+  inviteCodeInvalid = false;
 
   private messageSubject = new BehaviorSubject<{
     text: string;
@@ -53,8 +59,10 @@ export class UserRegistrationComponent {
     private fb: FormBuilder,
     private userService: UserService,
     private cdr: ChangeDetectorRef,
-    private loggingService: LoggingService
+    protected override loggingService: LoggingService
   ) {
+    super(loggingService);
+
     this.registrationForm = this.fb.group({
       firstName: [
         '',
@@ -78,7 +86,7 @@ export class UserRegistrationComponent {
         [Validators.required, Validators.minLength(8), this.passwordValidator],
       ],
       confirmPassword: ['', Validators.required],
-      inviteCode: new FormControl({ value: '', disabled: true }), // ✅ Правильный способ управления `disabled`
+      inviteCode: new FormControl({ value: '', disabled: true }),
     });
 
     this.registrationForm
@@ -86,14 +94,13 @@ export class UserRegistrationComponent {
       ?.valueChanges.pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        tap(() => {
-          this.isCheckingEmail = true;
-        }),
+        tap(() => (this.isCheckingEmail = true)),
         switchMap((email) =>
           this.userService
             .checkEmail(email)
             .pipe(tap(() => (this.isCheckingEmail = false)))
-        )
+        ),
+        takeUntil(this.destroy$)
       )
       .subscribe((response) => {
         this.emailExists = response.exists;
@@ -104,52 +111,49 @@ export class UserRegistrationComponent {
       ?.valueChanges.pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        map((value) => value !== this.registrationForm.get('password')?.value)
+        map((value) => value !== this.registrationForm.get('password')?.value),
+        takeUntil(this.destroy$)
       )
       .subscribe((isMismatch) => {
         this.passwordMismatch = isMismatch;
       });
 
-    let inviteCodeInitialized = false; // 🚀 Флаг, предотвращающий первый вызов
-    // ✅ Проверка инвайт-кода (если поле активно)
     this.registrationForm
       .get('inviteCode')
       ?.valueChanges.pipe(
         debounceTime(500),
         distinctUntilChanged(),
-        filter((code) => code && code.trim() !== ''), // Проверяем, что код не null и не пустой
+        filter((code) => code && code.trim() !== ''),
         tap(() => {
           this.isCheckingInvite = true;
           this.inviteCodeInvalid = false;
           this.inviteCodeUsed = false;
-          this.registrationForm.get('inviteCode')?.updateValueAndValidity(); // 🔄 Обновляем форму
+          this.registrationForm.get('inviteCode')?.updateValueAndValidity();
         }),
         switchMap((code) =>
           this.userService
             .checkInviteCode(code)
             .pipe(tap(() => (this.isCheckingInvite = false)))
-        )
+        ),
+        takeUntil(this.destroy$)
       )
       .subscribe((response) => {
-        if (!response.valid) {
-          this.inviteCodeInvalid = true;
-        } else if (response.used) {
-          this.inviteCodeUsed = true;
-        }
-        this.registrationForm.get('inviteCode')?.updateValueAndValidity(); // 🔄 Обновляем форму после проверки
+        if (!response.valid) this.inviteCodeInvalid = true;
+        else if (response.used) this.inviteCodeUsed = true;
+        this.registrationForm.get('inviteCode')?.updateValueAndValidity();
       });
   }
 
   ngOnInit() {
     this.isCheckingEmail = true;
     this.isCheckingInvite = true;
-    this.message$.subscribe((msg) => {
+    this.message$.pipe(takeUntil(this.destroy$)).subscribe((msg) => {
       this.loggingService.info(
         'userRegistrationComponent',
         '🔄 Обновление UI:',
         msg
       );
-      this.cdr.detectChanges(); // ✅ Форсируем обновление
+      this.cdr.detectChanges();
     });
   }
 
@@ -165,34 +169,18 @@ export class UserRegistrationComponent {
   }
 
   toggleInviteCode(event: any) {
-    this.loggingService.info(
-      'userRegistrationComponent',
-      'Чекбокс изменён:',
-      event.target.checked
-    ); // 🟢 Логирование
     this.inviteCodeEnabled = event.target.checked;
-
     const inviteCodeControl = this.registrationForm.get('inviteCode');
-
     if (this.inviteCodeEnabled) {
-      this.loggingService.info(
-        'userRegistrationComponent',
-        '✅ Поле Инвайт-код включено!'
-      );
-      inviteCodeControl?.enable({ emitEvent: false }); // ✅ Включаем поле без лишних событий
-      inviteCodeControl?.setValidators([Validators.required]); // ✅ Добавляем валидацию
+      inviteCodeControl?.enable({ emitEvent: false });
+      inviteCodeControl?.setValidators([Validators.required]);
     } else {
-      this.loggingService.info(
-        'userRegistrationComponent',
-        '❌ Поле Инвайт-код отключено!'
-      );
       inviteCodeControl?.setValue('');
-      inviteCodeControl?.clearValidators(); // ❌ Убираем валидацию
-      inviteCodeControl?.disable({ emitEvent: false }); // ✅ Отключаем без лишних событий
+      inviteCodeControl?.clearValidators();
+      inviteCodeControl?.disable({ emitEvent: false });
       this.inviteCodeUsed = false;
       this.inviteCodeInvalid = false;
     }
-
     inviteCodeControl?.updateValueAndValidity({ emitEvent: false });
   }
 
@@ -206,37 +194,38 @@ export class UserRegistrationComponent {
         invite_code: this.registrationForm.value.inviteCode || null,
       };
 
-      // Добавляем поле name отдельно в объект запроса
       const payload = {
         ...formData,
         name: `${formData.firstName} ${formData.lastName}`,
       };
 
-      this.userService.register(payload).subscribe({
-        next: (response) => {
-          this.loggingService.info(
-            'userRegistrationComponent',
-            '✅ Регистрация успешна:',
-            response
-          );
-          this.showMessage('✅ Пользователь зарегистрирован!', 'success');
-          this.registrationForm.reset();
-        },
-        error: (err) => {
-          this.loggingService.error(
-            'userRegistrationComponent',
-            '❌ Ошибка регистрации:',
-            err
-          );
-          const errorMessage = err.error?.detail
-            ? Array.isArray(err.error.detail)
-              ? err.error.detail.map((e: any) => e.msg).join(', ')
-              : err.error.detail
-            : 'Ошибка сервера';
-
-          this.showMessage(`❌ Ошибка регистрации: ${errorMessage}`, 'error');
-        },
-      });
+      this.userService
+        .register(payload)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            this.loggingService.info(
+              'userRegistrationComponent',
+              '✅ Регистрация успешна:',
+              response
+            );
+            this.showMessage('✅ Пользователь зарегистрирован!', 'success');
+            this.registrationForm.reset();
+          },
+          error: (err) => {
+            this.loggingService.error(
+              'userRegistrationComponent',
+              '❌ Ошибка регистрации:',
+              err
+            );
+            const errorMessage = err.error?.detail
+              ? Array.isArray(err.error.detail)
+                ? err.error.detail.map((e: any) => e.msg).join(', ')
+                : err.error.detail
+              : 'Ошибка сервера';
+            this.showMessage(`❌ Ошибка регистрации: ${errorMessage}`, 'error');
+          },
+        });
     } else {
       this.showMessage('⚠️ Проверьте форму, есть ошибки!', 'error');
     }
@@ -248,15 +237,17 @@ export class UserRegistrationComponent {
       `🔔 showMessage() вызван с текстом: ${text}, тип: ${type}`
     );
     this.messageSubject.next({ text, type });
-    this.cdr.detectChanges(); // ✅ Форсируем обновление UI
+    this.cdr.detectChanges();
 
-    timer(5000).subscribe(() => {
-      this.loggingService.info(
-        'userRegistrationComponent',
-        '⏳ Очистка сообщения через 5 секунд'
-      );
-      this.messageSubject.next(null);
-      this.cdr.detectChanges(); // ✅ Снова форсируем обновление UI
-    });
+    timer(5000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.loggingService.info(
+          'userRegistrationComponent',
+          '⏳ Очистка сообщения через 5 секунд'
+        );
+        this.messageSubject.next(null);
+        this.cdr.detectChanges();
+      });
   }
 }

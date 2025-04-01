@@ -1,8 +1,22 @@
 /* ✅ Основной контейнер */
+// .app-container {
+//   display: flex;
+//   flex-direction: column;
+// }
+
 .app-container {
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; // предотвращает горизонтальный скролл
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+
 
 /* ✅ Верхнее меню для десктопа */
 .header {
@@ -78,12 +92,21 @@
 }
 
 .sidebar--auth {
-  padding-top: 95px; //отступ от крестика когда isAuthenticated === true
+  padding-top: 95px;
+
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;//отступ от крестика когда isAuthenticated === true
 }
 
 /* ✅ Открытый сайдбар */
 .menu-open .sidebar {
   transform: translateX(0);
+
+  width: 100vw;
+  padding: 0;
+  margin: 0;
 }
 
 /* ✅ Кнопка закрытия */

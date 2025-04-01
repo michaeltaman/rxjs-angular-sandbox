@@ -8,17 +8,20 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { UserService } from '../../services/user.service'; // ✅ Добавляем UserService
+import { UserService } from '../../services/user.service';
 import { User } from '../../shared/models/user.model';
 import { LoggingService } from '../../services/logging.service';
+import { BaseComponent } from '../base.component';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent extends BaseComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string | null = null;
   user: User | null = null;
@@ -26,56 +29,63 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private userService: UserService, // ✅ Добавляем userService
+    private userService: UserService,
     private router: Router,
-    private loggingService: LoggingService
+    protected override loggingService: LoggingService
   ) {
+    super(loggingService);
+
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
 
-  ngOnInit() {
-    this.loginForm.valueChanges.subscribe(() => {
+  ngOnInit(): void {
+    this.loginForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.errorMessage = null;
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
 
-      this.authService.login(email, password).subscribe({
-        next: () => {
-          this.loggingService.info('loginComponent', '✅ Login successful');
+      this.authService
+        .login(email, password)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.loggingService.info('loginComponent', '✅ Login successful');
 
-          // ✅ Получаем профиль после успешного логина
-          this.userService.getUserProfile().subscribe({
-            next: (profile) => {
-              this.loggingService.info(
-                'loginComponent',
-                '✅ User profile loaded:',
-                profile
-              );
-              this.user = profile;
-              this.router.navigate(['/dashboard']); // ✅ Перенаправляем после успешного получения профиля
-            },
-            error: (err) => {
-              this.loggingService.error(
-                'loginComponent',
-                '❌ Error loading profile:',
-                err
-              );
-              this.errorMessage = 'Ошибка при загрузке профиля';
-            },
-          });
-        },
-        error: (err) => {
-          this.loggingService.error('loginComponent', '❌ Login error:', err);
-          this.errorMessage = 'Неверные учетные данные';
-        },
-      });
+            this.userService
+              .getUserProfile()
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: (profile) => {
+                  this.loggingService.info(
+                    'loginComponent',
+                    '✅ User profile loaded:',
+                    profile
+                  );
+                  this.user = profile;
+                  this.router.navigate(['/dashboard']);
+                },
+                error: (err) => {
+                  this.loggingService.error(
+                    'loginComponent',
+                    '❌ Error loading profile:',
+                    err
+                  );
+                  this.errorMessage = 'Ошибка при загрузке профиля';
+                },
+              });
+          },
+          error: (err) => {
+            this.loggingService.error('loginComponent', '❌ Login error:', err);
+            this.errorMessage = 'Неверные учетные данные';
+          },
+        });
     }
   }
 }
